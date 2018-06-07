@@ -38,6 +38,7 @@ def deposit(client, amount, address):
 @click.argument('amount1', type=int)
 @click.argument('newowner2')
 @click.argument('amount2', type=int)
+@click.argument('cur12', default=b'\x00' * 20)
 @click.argument('fee', default=0)
 @click.argument('key1')
 @click.argument('key2', required=False)
