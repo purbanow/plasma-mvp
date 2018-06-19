@@ -11,12 +11,30 @@ def root_chain(t, get_contract):
     t.chain.mine()
     return contract
 
+@pytest.fixture
+def token_a(t, get_contract):
+    contract = get_contract('MintableToken')
+    t.chain.mine()
+    return contract
+
 def test_add_token(t, u, root_chain, assert_tx_failed):
     fake_token, value_1 = t.a0, 100
     assert not root_chain.hasToken(fake_token)
     root_chain.addToken(fake_token)
     assert root_chain.hasToken(fake_token)
     assert_tx_failed(lambda: root_chain.addToken(fake_token))
+
+def test_token_deployment(t, u, root_chain, get_contract):
+    contract = get_contract('MintableToken')
+    t.chain.mine()
+    owner, value_1 = t.a0, 100
+    contract.mint(owner, 100)
+    assert 100 == contract.balanceOf(owner)
+
+def test_token_adding(t, u, token_a, root_chain):
+    assert not root_chain.hasToken(token_a.address)
+    root_chain.addToken(token_a.address)
+    assert root_chain.hasToken(token_a.address)
 
 def test_deposit(t, u, root_chain):
     owner, value_1 = t.a0, 100

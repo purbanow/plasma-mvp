@@ -243,6 +243,14 @@ contract RootChain {
             require(address(0) == token);
             currentExit.owner.transfer(currentExit.amount);
             queue.delMin();
+            // FIXME: something like this:
+            /* if (address(0) == token) { */
+            /*     currentExit.owner.transfer(currentExit.amount); */
+            /* } */
+            /* else { */
+            /*     require(ERC20Basic(token).transfer(currentExit.owner, currentExit.amount)); */
+            /* } */
+            /* queue.delMin(); */
             delete exits[utxoPos].owner;
 
             if (queue.currentSize() > 0) {
