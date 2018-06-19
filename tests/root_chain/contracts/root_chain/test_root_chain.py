@@ -11,6 +11,12 @@ def root_chain(t, get_contract):
     t.chain.mine()
     return contract
 
+def test_add_token(t, u, root_chain, assert_tx_failed):
+    fake_token, value_1 = t.a0, 100
+    assert not root_chain.hasToken(fake_token)
+    root_chain.addToken(fake_token)
+    assert root_chain.hasToken(fake_token)
+    assert_tx_failed(lambda: root_chain.addToken(fake_token))
 
 def test_deposit(t, u, root_chain):
     owner, value_1 = t.a0, 100

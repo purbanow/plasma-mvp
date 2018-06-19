@@ -93,6 +93,24 @@ contract RootChain {
         exitsQueues[address(0)] = address(new PriorityQueue());
     }
 
+    // @dev Allows anyone to add new token to Plasma chain
+    // @param token The address of the ERC-20 token
+    function addToken(address token)
+        public
+    {
+        require(exitsQueues[token] == address(0));
+        exitsQueues[token] = address(new PriorityQueue());
+        TokenAdded(token);
+    }
+
+    function hasToken(address token)
+        view
+        public
+        returns (bool)
+    {
+        return exitsQueues[token] != address(0);
+    }
+
     // @dev Allows Plasma chain operator to submit block root
     // @param root The root of a child chain block
     function submitBlock(bytes32 root)
