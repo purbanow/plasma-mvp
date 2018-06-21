@@ -56,6 +56,31 @@ library PlasmaRLP {
         });
     }
 
+    function justEight(bytes memory tx_bytes)
+        internal
+        constant
+        returns (uint256, address, address)
+    {
+        var txList = toList(toRLPItem(tx_bytes), 8);
+        return (toUint(txList[5]),
+                toAddress(txList[6]),
+                toAddress(txList[7])
+                );
+    }
+
+    function almostTen(bytes memory tx_bytes)
+        internal
+        constant
+        returns (uint256, address, address, address)
+    {
+        var txList = toList(toRLPItem(tx_bytes), 9);
+        return (toUint(txList[5]),
+                toAddress(txList[6]),
+                toAddress(txList[7]),
+                toAddress(txList[8])
+                );
+    }
+
     /* Iterator */
 
     function next(Iterator memory self) private constant returns (RLPItem memory subItem) {
