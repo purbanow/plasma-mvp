@@ -8,7 +8,7 @@ from plasma.child_chain.child_chain import ChildChain
 from plasma.child_chain.transaction import Transaction, UnsignedTransaction
 from plasma.utils.merkle.fixed_merkle import FixedMerkle
 from plasma.utils.utils import confirm_tx
-from .constants import AUTHORITY, ACCOUNTS, NULL_ADDRESS
+from .constants import AUTHORITY, ACCOUNTS, NULL_ADDRESS, NULL_ADDRESS_HEX
 
 class TestingLanguage(object):
 
@@ -17,22 +17,10 @@ class TestingLanguage(object):
     def __init__(self):
         self.w3 = Web3(HTTPProvider('http://localhost:8545'))
         self.root_chain = Deployer().deploy_contract('RootChain', concise=False)
-        self.child_chain = ChildChain(bytes.fromhex(AUTHORITY['address'][2:]), self.root_chain)
+        self.child_chain = ChildChain(AUTHORITY['address'], self.root_chain)
 
         self.transactions = []
         self.accounts = []
-
-        self.handlers = dict()
-
-        # Register handlers
-        self.register_handler('Deposit', self.deposit)
-        self.register_handler('Transfer', self.transfer)
-        self.register_handler('SubmitBlock', self.submit_block)
-        self.register_handler('Confirm', self.confirm)
-        self.register_handler('Withdraw', self.withdraw)
-
-    def register_handler(self, token, function):
-        self.handlers[token] = function
 
     def get_account(self):
         account = ACCOUNTS[len(self.accounts)]
@@ -52,6 +40,7 @@ class TestingLanguage(object):
 
         tx = Transaction(0, 0, 0,
                          0, 0, 0,
+                         NULL_ADDRESS,
                          account['address'], amount,
                          NULL_ADDRESS, 0)
 
@@ -64,7 +53,7 @@ class TestingLanguage(object):
 
     def transfer(self,
                  input1, oindex1, newowner1, amount1, signatory1,
-                 input2=None, oindex2=0, newowner2=None, amount2=None, signatory2=None):
+                 input2=None, oindex2=0, newowner2=None, amount2=None, signatory2=None, cur12=NULL_ADDRESS):
         newowner_address1 = newowner1['address']
         amount1 = int(amount1)
 
@@ -83,6 +72,7 @@ class TestingLanguage(object):
 
         tx = Transaction(blknum1, txindex1, oindex1,
                          blknum2, txindex2, oindex2,
+                         cur12,
                          newowner_address1, amount1,
                          newowner_address2, amount2)
 
@@ -149,7 +139,7 @@ class TestingLanguage(object):
 
             self.root_chain.transact({
                 'from': exitor['address']
-            }).startDepositExit(utxo_pos + 1, deposit_amount)
+            }).startDepositExit(utxo_pos + 1, NULL_ADDRESS_HEX, deposit_amount)
         else:
             output_block = self.child_chain.blocks[blknum]
             hashed_transaction_set = [transaction.merkle_hash for transaction in output_block.transaction_set]
