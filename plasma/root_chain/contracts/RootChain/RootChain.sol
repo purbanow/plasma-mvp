@@ -39,6 +39,11 @@ contract RootChain {
         address token
     );
 
+    event BlockSubmitted(
+       bytes32 root,
+       uint256 timestamp
+   );
+
     /*
      *  Storage
      */
@@ -105,6 +110,7 @@ contract RootChain {
         });
         currentChildBlock = currentChildBlock.add(childBlockInterval);
         currentDepositBlock = 1;
+        BlockSubmitted(root, block.timestamp);
     }
 
     // @dev Allows anyone to deposit funds into the Plasma chain
