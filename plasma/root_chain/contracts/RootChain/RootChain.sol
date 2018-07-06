@@ -192,18 +192,16 @@ contract RootChain {
     // @param proof Proof of inclusion for the transaction used to challenge
     // @param sigs Signatures for the transaction used to challenge
     // @param confirmationSig The confirmation signature for the transaction used to challenge
-    function challengeExit(uint256 cUtxoPos, uint256 eUtxoIndex, bytes txBytes, bytes proof, bytes sigs, bytes confirmationSig)
+    function challengeExit(uint256 cUtxoPos, uint256 eUtxoIndex, bytes txBytes, bytes proof, bytes sigs)
         public
     {
         uint256 eUtxoPos = txBytes.getUtxoPos(eUtxoIndex);
         uint256 txindex = (cUtxoPos % 1000000000) / 10000;
         bytes32 root = childChain[cUtxoPos / 1000000000].root;
         var txHash = keccak256(txBytes);
-        var confirmationHash = keccak256(txHash, root);
         var merkleHash = keccak256(txHash, sigs);
         address owner = exits[eUtxoPos].owner;
 
-        require(owner == ECRecovery.recover(confirmationHash, confirmationSig));
         require(merkleHash.checkMembership(txindex, root, proof));
         // Clear as much as possible from succesful challenge
         delete exits[eUtxoPos].owner;
